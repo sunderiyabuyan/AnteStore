@@ -1,11 +1,11 @@
 """
-Force Database Table Creation Script
-This will create all tables and verify they exist
+Fixed Database Setup Script for SQLAlchemy 2.0+
 """
 from app import create_app, db
 from app.models.user import User
 from app.models.products import Product
 from app.models.sales import Sale, SalesItem
+from sqlalchemy import text
 
 def force_create_tables():
     """Force create all database tables"""
@@ -16,12 +16,13 @@ def force_create_tables():
         print("🔧 Starting database table creation...")
         
         try:
-            # Test database connection first
+            # Test database connection first (SQLAlchemy 2.0 syntax)
             print("📡 Testing database connection...")
-            result = db.engine.execute('SELECT 1 as test')
-            test_result = result.fetchone()[0]
-            if test_result == 1:
-                print("✅ Database connection successful!")
+            with db.engine.connect() as connection:
+                result = connection.execute(text('SELECT 1 as test'))
+                test_result = result.fetchone()[0]
+                if test_result == 1:
+                    print("✅ Database connection successful!")
             
             # Show current database URL (masked)
             db_url = str(db.engine.url)
@@ -71,6 +72,19 @@ def force_create_tables():
             
             if missing_tables:
                 print(f"⚠️ Missing tables: {missing_tables}")
+                
+                # Try to get more info about why tables are missing
+                print("🔍 Debugging missing tables...")
+                
+                # Check if models are properly defined
+                try:
+                    print(f"User model table name: {User.__tablename__}")
+                    print(f"Product model table name: {Product.__tablename__}")
+                    print(f"Sale model table name: {Sale.__tablename__}")
+                    print(f"SalesItem model table name: {SalesItem.__tablename__}")
+                except Exception as e:
+                    print(f"Error checking model table names: {e}")
+                
                 return False
             else:
                 print("🎉 All required tables created successfully!")
@@ -122,10 +136,39 @@ def create_admin_user():
             traceback.print_exc()
             return False
 
+def debug_models():
+    """Debug model definitions"""
+    
+    print("🔍 Debugging model definitions...")
+    
+    try:
+        from app.models.user import User
+        from app.models.products import Product
+        from app.models.sales import Sale, SalesItem
+        
+        print("✅ All models imported successfully")
+        
+        # Check model metadata
+        from app import db
+        print(f"Database metadata tables: {list(db.metadata.tables.keys())}")
+        
+        # Check if models are properly registered
+        for model in [User, Product, Sale, SalesItem]:
+            print(f"Model {model.__name__}: table='{model.__tablename__}', registered={hasattr(model, '__table__')}")
+            
+    except Exception as e:
+        print(f"❌ Error with models: {e}")
+        import traceback
+        traceback.print_exc()
+
 def main():
     """Main function to set up everything"""
-    print("🚀 Database Setup Script")
+    print("🚀 Database Setup Script (SQLAlchemy 2.0 Compatible)")
     print("=" * 60)
+    
+    # Step 0: Debug models
+    debug_models()
+    print()
     
     # Step 1: Create tables
     if not force_create_tables():
