@@ -5,7 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     # Basic Flask configuration
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'ante1213$')
     
     # Database configuration - Railway provides DATABASE_URL
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
