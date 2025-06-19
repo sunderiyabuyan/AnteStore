@@ -9,30 +9,104 @@
     </div>
 </div>
 
-<!-- Summary Statistics -->
-<div class="row">
-    <div class="col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-value">${{ "%.2f"|format(total_revenue) }}</div>
-            <div>Total Revenue</div>
+<!-- Date Filter Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-calendar-alt"></i> Date Range Filter</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-control" name="date_from" value="{{ date_from }}" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-control" name="date_to" value="{{ date_to }}" required>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Apply Filter
+                </button>
+            </div>
+            <div class="col-md-4">
+                <div class="btn-group" role="group">
+                    <a href="?date_from={{ last_7_days }}&date_to={{ today_str }}" 
+                       class="btn btn-outline-secondary btn-sm">Last 7 Days</a>
+                    <a href="?date_from={{ last_30_days }}&date_to={{ today_str }}" 
+                       class="btn btn-outline-secondary btn-sm">Last 30 Days</a>
+                    <a href="?date_from={{ last_90_days }}&date_to={{ today_str }}" 
+                       class="btn btn-outline-secondary btn-sm">Last 90 Days</a>
+                </div>
+            </div>
+        </form>
+        <div class="mt-2">
+            <small class="text-muted">
+                <i class="fas fa-info-circle"></i> 
+                Showing data from {{ date_from }} to {{ date_to }} ({{ period_days }} days)
+            </small>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-value">{{ total_sales_count }}</div>
-            <div>Total Sales</div>
-        </div>
+</div>
+
+<!-- Summary Statistics Table -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-chart-line"></i> Financial Summary</h5>
     </div>
-    <div class="col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-value">${{ "%.2f"|format(avg_sale_value) }}</div>
-            <div>Avg Sale Value</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card text-center">
-            <div class="stat-value">{{ category_stats|length }}</div>
-            <div>Active Categories</div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th><i class="fas fa-chart-bar me-1"></i>Metric</th>
+                        <th class="text-center"><i class="fas fa-dollar-sign me-1"></i>Amount</th>
+                        <th class="text-center"><i class="fas fa-info-circle me-1"></i>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-primary">
+                        <td><strong><i class="fas fa-coins me-2 text-primary"></i>Total Revenue</strong></td>
+                        <td class="text-center fs-5"><strong>${{ "%.2f"|format(total_revenue) }}</strong></td>
+                        <td class="text-center text-muted">Total sales income</td>
+                    </tr>
+                    <tr class="table-warning">
+                        <td><strong><i class="fas fa-receipt me-2 text-warning"></i>Total Cost</strong></td>
+                        <td class="text-center fs-5"><strong>${{ "%.2f"|format(total_cost) }}</strong></td>
+                        <td class="text-center text-muted">Cost of goods sold</td>
+                    </tr>
+                    <tr class="table-success">
+                        <td><strong><i class="fas fa-chart-line me-2 text-success"></i>Total Profit</strong></td>
+                        <td class="text-center fs-5"><strong>${{ "%.2f"|format(total_profit) }}</strong></td>
+                        <td class="text-center text-muted">Revenue - Cost</td>
+                    </tr>
+                    <tr>
+                        <td><strong><i class="fas fa-percentage me-2 text-info"></i>Profit Margin</strong></td>
+                        <td class="text-center fs-5"><strong>{{ "%.1f"|format(profit_margin_percentage) }}%</strong></td>
+                        <td class="text-center text-muted">Profit / Revenue ratio</td>
+                    </tr>
+                    <tr>
+                        <td><strong><i class="fas fa-shopping-cart me-2 text-secondary"></i>Total Sales</strong></td>
+                        <td class="text-center fs-5"><strong>{{ total_sales_count }}</strong></td>
+                        <td class="text-center text-muted">Number of transactions</td>
+                    </tr>
+                    <tr>
+                        <td><strong><i class="fas fa-calendar-day me-2 text-primary"></i>Daily Average Revenue</strong></td>
+                        <td class="text-center fs-5"><strong>${{ "%.2f"|format(total_revenue / period_days if period_days > 0 else 0) }}</strong></td>
+                        <td class="text-center text-muted">Revenue per day</td>
+                    </tr>
+                    <tr>
+                        <td><strong><i class="fas fa-chart-bar me-2 text-success"></i>Average Sale Value</strong></td>
+                        <td class="text-center fs-5"><strong>${{ "%.2f"|format(avg_sale_value) }}</strong></td>
+                        <td class="text-center text-muted">Revenue per transaction</td>
+                    </tr>
+                    <tr>
+                        <td><strong><i class="fas fa-money-bill-wave me-2 text-info"></i>Average Profit per Sale</strong></td>
+                        <td class="text-center fs-5"><strong>${{ "%.2f"|format(avg_profit_per_sale) }}</strong></td>
+                        <td class="text-center text-muted">Profit per transaction</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -40,39 +114,45 @@
 <div class="row">
     <!-- Top Products -->
     <div class="col-md-6">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
                 <h5><i class="fas fa-trophy"></i> Top Selling Products</h5>
             </div>
             <div class="card-body">
                 {% if top_products %}
                 <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
+                    <table class="table table-sm table-hover">
+                        <thead class="table-dark">
                             <tr>
                                 <th>Rank</th>
                                 <th>Product</th>
                                 <th>Units Sold</th>
                                 <th>Revenue</th>
+                                <th>Profit</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for product in top_products %}
                             <tr>
-                                <td><strong>#{{ loop.index }}</strong></td>
+                                <td>
+                                    <span class="badge bg-{% if loop.index == 1 %}warning{% elif loop.index == 2 %}secondary{% elif loop.index == 3 %}dark{% else %}light text-dark{% endif %}">
+                                        #{{ loop.index }}
+                                    </span>
+                                </td>
                                 <td>
                                     <strong>{{ product.name }}</strong><br>
                                     <small class="text-muted">{{ product.category }}</small>
                                 </td>
-                                <td>{{ product.units_sold }}</td>
+                                <td><strong>{{ product.units_sold }}</strong></td>
                                 <td><strong>${{ "%.2f"|format(product.revenue) }}</strong></td>
+                                <td class="text-success"><strong>${{ "%.2f"|format(product.profit or 0) }}</strong></td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 {% else %}
-                <p class="text-muted">No sales data available</p>
+                <p class="text-muted text-center">No sales data for selected period</p>
                 {% endif %}
             </div>
         </div>
@@ -80,19 +160,20 @@
 
     <!-- Sales by Category -->
     <div class="col-md-6">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
                 <h5><i class="fas fa-chart-pie"></i> Sales by Category</h5>
             </div>
             <div class="card-body">
                 {% if category_stats %}
                 <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
+                    <table class="table table-sm table-hover">
+                        <thead class="table-dark">
                             <tr>
                                 <th>Category</th>
-                                <th>Units Sold</th>
+                                <th>Units</th>
                                 <th>Revenue</th>
+                                <th>Profit</th>
                                 <th>Share</th>
                             </tr>
                         </thead>
@@ -100,18 +181,106 @@
                             {% for category in category_stats %}
                             <tr>
                                 <td><span class="badge bg-secondary">{{ category.category }}</span></td>
-                                <td>{{ category.units_sold }}</td>
-                                <td>${{ "%.2f"|format(category.revenue) }}</td>
+                                <td><strong>{{ category.units_sold }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(category.revenue) }}</strong></td>
+                                <td class="text-success"><strong>${{ "%.2f"|format(category.profit or 0) }}</strong></td>
+                                <td>
+                                    {% set percentage = (category.revenue / total_revenue * 100) if total_revenue > 0 else 0 %}
+                                    <span class="badge bg-info">{{ "%.1f"|format(percentage) }}%</span>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 {% else %}
-                <p class="text-muted">No sales data available</p>
+                <p class="text-muted text-center">No category data for selected period</p>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-update date inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const dateFromInput = document.querySelector('input[name="date_from"]');
+    const dateToInput = document.querySelector('input[name="date_to"]');
+    
+    // Set max date to today
+    const today = new Date().toISOString().split('T')[0];
+    dateFromInput.setAttribute('max', today);
+    dateToInput.setAttribute('max', today);
+    
+    // Update min date for 'to' input when 'from' changes
+    dateFromInput.addEventListener('change', function() {
+        dateToInput.setAttribute('min', this.value);
+    });
+});
+
+// Add hover effects to table rows
+document.addEventListener('DOMContentLoaded', function() {
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+});
+</script>
+
+<style>
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa !important;
+}
+
+.fs-5 {
+    font-size: 1.25rem !important;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.card-header h5 {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.table-responsive {
+    border-radius: 0.5rem;
+}
+
+/* Custom row colors for financial summary */
+.table-primary td {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.table-warning td {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.table-success td {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+}
+</style>
 {% endblock %}
