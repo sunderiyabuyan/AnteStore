@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual Environment
+venv/
+env/
+.venv/
+.env
+
+# Flask
+instance/
+.webassets-cache
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+app.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Migrations (optional)
+migrations/
+
+# Sensitive files
+config_local.py
+secrets.py
+*.pem
+*.key
+
+# User uploads
+uploads/
+*.csv
+!sample_products.csv
