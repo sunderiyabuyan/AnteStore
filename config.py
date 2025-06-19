@@ -11,7 +11,7 @@ class Config:
         if DATABASE_URL.startswith('postgres://'):
             DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
         
-        # Try pg8000 driver if psycopg2 fails
+        # Add SSL mode for production
         if 'postgresql://' in DATABASE_URL and 'sslmode' not in DATABASE_URL:
             DATABASE_URL += '?sslmode=require'
     
@@ -21,3 +21,6 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
     ITEMS_PER_PAGE = 50
     LOW_STOCK_THRESHOLD = 10
+    
+    # Production settings
+    DEBUG = os.environ.get('FLASK_ENV') != 'production'
