@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory - Store Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-boxes"></i> Inventory Management</h1>
+    </div>
+</div>
+
+<!-- Add Product Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-plus"></i> Add New Product</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('add_product') }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Food">Food & Beverages</option>
+                            <option value="Books">Books</option>
+                            <option value="Home">Home & Garden</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Price ($)</label>
+                        <input type="number" class="form-control" name="price" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Initial Stock</label>
+                        <input type="number" class="form-control" name="stock" min="0" required>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Min Stock</label>
+                        <input type="number" class="form-control" name="min_stock" min="0" value="10" required>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-gradient">
+                <i class="fas fa-plus"></i> Add Product
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-list"></i> Product Inventory</h5>
+    </div>
+    <div class="card-body">
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr {% if product.is_low_stock %}class="low-stock"{% endif %}>
+                        <td>#{{ product.id }}</td>
+                        <td><strong>{{ product.name }}</strong></td>
+                        <td><span class="badge bg-secondary">{{ product.category }}</span></td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td><strong>{{ product.stock }}</strong></td>
+                        <td>
+                            {% if product.is_low_stock %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-triangle"></i> Low Stock
+                                </span>
+                            {% else %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> In Stock
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('delete_product', product_id=product.id) }}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this product?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No products added yet. Add your first product above!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

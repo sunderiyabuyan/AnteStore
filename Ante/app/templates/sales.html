@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Sales - Store Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-shopping-cart"></i> Sales Management</h1>
+    </div>
+</div>
+
+<!-- Record Sale Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="fas fa-plus"></i> Record New Sale</h5>
+    </div>
+    <div class="card-body">
+        {% if products %}
+        <form method="POST" action="{{ url_for('record_sale') }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Select Product</label>
+                        <select class="form-select" name="product_id" required>
+                            <option value="">Choose a product</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">
+                                {{ product.name }} (Stock: {{ product.stock }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" name="quantity" min="1" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name (Optional)</label>
+                        <input type="text" class="form-control" name="customer_name" 
+                               placeholder="Walk-in Customer">
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success btn-gradient mb-3">
+                        <i class="fas fa-cash-register"></i> Record Sale
+                    </button>
+                </div>
+            </div>
+        </form>
+        {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-info-circle"></i> 
+            No products available for sale. Please add products to inventory first.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Sales History -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-history"></i> Sales History</h5>
+    </div>
+    <div class="card-body">
+        {% if sales_history %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Customer</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales_history %}
+                    <tr>
+                        <td>{{ sale.sale_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td><strong>{{ sale.product_ref.name }}</strong></td>
+                        <td>{{ sale.customer_name }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>${{ "%.2f"|format(sale.unit_price) }}</td>
+                        <td><strong>${{ "%.2f"|format(sale.total_amount) }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No sales recorded yet. Record your first sale above!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

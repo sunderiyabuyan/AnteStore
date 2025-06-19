@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Store Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-chart-pie"></i> Dashboard</h1>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">{{ total_products }}</div>
+            <div>Total Products</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">${{ "%.2f"|format(total_stock_value) }}</div>
+            <div>Stock Value</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">${{ "%.2f"|format(today_sales) }}</div>
+            <div>Today's Sales</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">{{ low_stock_count }}</div>
+            <div>Low Stock Items</div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Alert -->
+{% if low_stock_products %}
+<div class="alert alert-low-stock">
+    <h5><i class="fas fa-exclamation-triangle"></i> Low Stock Alert!</h5>
+    <p>The following products are running low on stock:</p>
+    <ul class="mb-0">
+        {% for product in low_stock_products %}
+        <li><strong>{{ product.name }}</strong> - Only {{ product.stock }} left (Min: {{ product.min_stock }})</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Recent Activities -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Recent Activities</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_activities %}
+                    {% for activity in recent_activities %}
+                    <div class="activity-item">
+                        <small class="text-muted">{{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                        <br>
+                        <strong>{{ activity.action }}:</strong> {{ activity.description }}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No recent activities</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
