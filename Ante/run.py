@@ -5,28 +5,12 @@ from app import create_app
 app = create_app()
 
 if __name__ == '__main__':
-    # Run the app
-    port = int(os.environ.get('PORT', 7200))
-    debug = os.environ.get('FLASK_ENV') == 'development'
+    # Railway provides PORT environment variable
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_ENV') != 'production'
     
     print("🚀 Starting Flask Store Management System...")
-    print(f"📍 Running on: http://localhost:{port}")
+    print(f"📍 Running on port: {port}")
     print(f"🔧 Debug mode: {debug}")
-    print(f"💾 Database: {app.config['SQLALCHEMY_DATABASE_URI']}")
     
-    # Check if database has data
-    with app.app_context():
-        from app.models.user import User
-        if not User.query.first():
-            print()
-            print("⚠️  No admin user found in database!")
-            print("🔧 Run: python populate_db.py")
-            print("   or: python populate_db.py reset")
-            print()
-    
-    try:
-        app.run(host='0.0.0.0', port=port, debug=debug)
-    except KeyboardInterrupt:
-        print("👋 Shutting down gracefully...")
-    except Exception as e:
-        print(f"❌ Error starting application: {e}")
+    app.run(host='0.0.0.0', port=port, debug=debug)
