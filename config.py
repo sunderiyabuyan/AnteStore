@@ -1,26 +1,33 @@
 import os
 from datetime import timedelta
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 class Config:
+    # Basic Flask configuration
     SECRET_KEY = os.environ.get('SECRET_KEY', 'ante1213$')
     
-    # Handle different PostgreSQL drivers
-    DATABASE_URL = os.environ.get('DATABASE_URL')
-    if DATABASE_URL:
-        # Replace postgres:// with postgresql:// if needed
-        if DATABASE_URL.startswith('postgres://'):
-            DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
-        
-        # Add SSL mode for production
-        if 'postgresql://' in DATABASE_URL and 'sslmode' not in DATABASE_URL:
-            DATABASE_URL += '?sslmode=require'
-    
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL or 'sqlite:///app.db'
+    # Database configuration - Railway provides DATABASE_URL
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    # Session configuration
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
+    
+    # Application settings
     ITEMS_PER_PAGE = 50
     LOW_STOCK_THRESHOLD = 10
-    
-    # Production settings
-    DEBUG = os.environ.get('FLASK_ENV') != 'production'
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+
+class ProductionConfig(Config):
+    DEBUG = False
+
+# Configuration dictionary
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
+}
